@@ -28,7 +28,7 @@ public class Question1 {
 		
 	}
 	
-	public Question(String questionString, String[] answers, Type type, char correctAnswer) {
+	public Question1(String questionString, String[] answers, Type type, char correctAnswer) {
 		this.questionString = questionString;
 		this.answers = answers;
 		this.type = type;
