@@ -68,4 +68,8 @@ public class Question1 {
 	public Type getType() {
 		return type;
 	}
+	
+	public String toString() {
+		return questionString;
+	}
 }

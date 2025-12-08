@@ -12,14 +12,21 @@ package final_project;
 */
 import java.util.ArrayList;
 import java.util.Random;
+import java.util.Scanner;
+import java.io.File;
+import java.io.FileNotFoundException;
 public class Answer {
 	private Question1 currentQuestion;
-	private ArrayList<Question1> trueFalseQuestions;
+	private ArrayList<Question1> trueFalseQuestions; // Original question list not to be altered
 	private ArrayList<Question1> multipleChoiceQuestions;
+	private ArrayList<Question1> gameTFQuestions; // Questions which will be altered during gameplay
+	private ArrayList<Question1> gameMCQuestions;
 	
 	public Answer() {
 		trueFalseQuestions = new ArrayList<Question1>();
 		multipleChoiceQuestions = new ArrayList<Question1>();
+		gameTFQuestions = new ArrayList<Question1>();
+		gameMCQuestions = new ArrayList<Question1>();
 	}
 	
 	/// Method for adding questions one by one
@@ -30,8 +37,56 @@ public class Answer {
 			multipleChoiceQuestions.add(question);
 	}
 	
+	/// Method for loading questions using a file. Takes a file and a question type, then adds the questions to both question lists of the given type (the one that
+	///	doesn't change and the one edited during the game)
+	public void loadQuestions(File file, Question1.Type type) throws FileNotFoundException {
+		Scanner scan = new Scanner(file);
+		String questionString;
+		String category = "default";
+		String explanation = "default";
+		char correctAnswer;
+		int length;
+		ArrayList<Question1> questionList;
+		ArrayList<Question1> gameQuestionList;
+		if  (type == Question1.Type.TRUE_FALSE) { // two answers for true / false; references the corresponding lists of the given type
+			length = 2;
+			questionList = trueFalseQuestions;
+			gameQuestionList = gameTFQuestions;
+		}
+		else {
+			length = 4; // four answers for multiple choice
+			questionList = multipleChoiceQuestions;
+			gameQuestionList = gameMCQuestions;
+		}
+		String[] answers = new String[length];
+
+		
+		while (scan.hasNextLine()) {
+			// category = scan.nextLine();
+			questionString = scan.nextLine();
+			for (int i = 0; i < length; i++) {
+				answers[i] = scan.nextLine();
+			}
+			String correctLine = scan.nextLine();
+			if  (type == Question1.Type.TRUE_FALSE) {
+				if (correctLine.toLowerCase().equals("true")) {
+					correctAnswer = 'T';
+				}
+				else
+					correctAnswer = 'F';
+			}
+			else
+				correctAnswer = correctLine.charAt(0);
+			Question1 question = new Question1(category,questionString,answers,explanation,type,correctAnswer);
+			questionList.add(question);
+			gameQuestionList.add(question);
+		}
+		
+		scan.close();
+	}
+	
 	/// Method for adding all questions via a single question ArrayList
-	public void loadQuestions(ArrayList<Question1> questions) {
+	public void setQuestions(ArrayList<Question1> questions) {
 		for (Question1 question : questions) {
 			if (question.getType() == Question1.Type.TRUE_FALSE)
 				trueFalseQuestions.add(question);
@@ -74,5 +129,23 @@ public class Answer {
 			currentQuestion  = multipleChoiceQuestions.get(rand.nextInt(multipleChoiceQuestions.size()));
 			multipleChoiceQuestions.remove(currentQuestion);
 		}
+	}
+	/// Method which resets either the multiple choice or the true/false question lists used in the game based on the input type.
+	public void refreshQuestions(Question1.Type type) {
+		if (type == Question1.Type.TRUE_FALSE) {
+			gameTFQuestions.clear();
+			for (Question1 question : trueFalseQuestions) {
+				gameTFQuestions.add(question);
+			}
+		}
+		else {
+			gameMCQuestions.clear();
+			for (Question1 question : multipleChoiceQuestions) {
+				gameMCQuestions.add(question);
+			}
+		}
+			
+		
+
 	}
 }
