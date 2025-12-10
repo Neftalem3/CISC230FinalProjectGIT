@@ -1,7 +1,7 @@
 package final_project;
 
 /*
-* File: TimedMode.java
+* File: Hard.java
 * Author: Daniel Grib
 * Course: CISC230
 * Lab: Group Sustainability Lab
@@ -11,71 +11,78 @@ package final_project;
 *              This is the hard difficulty for the game.
 */
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.util.Random;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.VBox;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
+import java.io.File;
+
+
 public class Hard extends MemoryGame {
-
-    private int totalTime;
-    private int timeRemaining;
-    private int score;
-
-    private Timeline timer;
-    private boolean timerRunning;
-
-    private Random rand = new Random();
-
-    private Label timerLabel;
-    private Label scoreLabel;
-
-    private Scene gameScene;
 
     private Answer answerManager;
 
-    public Hard(Scene scene, Label timerLabel, Label scoreLabel, int totalTimeSeconds) {
-        super();
-        this.gameScene = scene;
-        this.timerLabel = timerLabel;
+    private int score = 0;
+    private Label scoreLabel;
+
+    private Stage primaryStage;
+
+    private int totalTime = 60;       // 60-second round by default
+    private int timeRemaining = 60;
+    private Label timerLabel;
+
+    private Timeline timer;
+    private boolean timerRunning = false;
+
+
+    public Hard(Stage primaryStage, Label scoreLabel, Label timerLabel) {
+        super();    // builds grid
+        this.primaryStage = primaryStage;
         this.scoreLabel = scoreLabel;
+        this.timerLabel = timerLabel;
 
-        this.totalTime = totalTimeSeconds;
-        this.timeRemaining = totalTimeSeconds;
+        answerManager = new Answer();
+        loadMCQuestions();
 
-        this.score = 0;
-        this.timerRunning = false;
-
-        this.answerManager = new Answer();
-        loadAllQuestions();
-
-        updateTimerLabel();
         updateScoreLabel();
+        updateTimerLabel();
+        buildTopBar();
+        startTimer();
     }
 
-    @Override
-    public Scene getScene() {
-        return gameScene;
-    }
 
-    private void loadAllQuestions() {
+    private void loadMCQuestions() {
         try {
-            answerManager.loadQuestions(new File("MCQuestions.txt"), Question1.Type.MULTIPLE_CHOICE);
-            answerManager.loadQuestions(new File("TFQuestions.txt"), Question1.Type.TRUE_FALSE);
-        }
-        catch (FileNotFoundException e) {
-            System.out.println("Error loading question files: " + e.getMessage());
+            answerManager.loadQuestions(
+                new File("MCQuestions.txt"),
+                Question.Type.MULTIPLE_CHOICE
+            );
+        } catch (Exception e) {
+            System.out.println("Error loading MC questions: " + e.getMessage());
         }
     }
 
-    public void start() {
+    private void buildTopBar() {
+        HBox topBar = new HBox(30);
+        topBar.setAlignment(Pos.CENTER);
+
+        scoreLabel.setText("Score: 0");
+        timerLabel.setText("Time: " + timeRemaining);
+
+        topBar.getChildren().addAll(scoreLabel, timerLabel);
+
+        this.setTop(topBar); // ← Using the MemoryGame method!
+    }
+
+    // -----------------------------
+    //  Timer Control
+    // -----------------------------
+    private void startTimer() {
         timerRunning = true;
 
         timer = new Timeline(
@@ -95,93 +102,53 @@ public class Hard extends MemoryGame {
         timer.play();
     }
 
-    private void updateTimerLabel() {
-        timerLabel.setText("Time Left: " + Math.max(timeRemaining, 0) + "s");
+
+    private void stopTimer() {
+        if (timer != null) timer.stop();
     }
+
+
+    private void resumeTimer() {
+        if (timer != null && timerRunning) timer.play();
+    }
+
+
+    private void updateTimerLabel() {
+        timerLabel.setText("Time: " + Math.max(timeRemaining, 0) + "s");
+    }
+
 
     private void updateScoreLabel() {
         scoreLabel.setText("Score: " + score);
     }
 
+
     @Override
-    public void askQuestion(Question ignored) {
+    public Scene getScene() {
+        return gameScene;
+    }
+
+
+    // -----------------------------
+    //  Question Handling
+    // -----------------------------
+    @Override
+    public void askQuestion() {
         if (!timerRunning) return;
 
-        // Select MC question using the Answer system
-        answerManager.selectQuestion(Question1.Type.MULTIPLE_CHOICE);
-        Question1 selectedQ = answerManager.getQuestion();
+        // Pause timer while answering
+        stopTimer();
 
-        showMCQuestionPopup(selectedQ);
+        answerManager.selectQuestion(Question.Type.MULTIPLE_CHOICE);
+        Question q = answerManager.getQuestion();
+
+        QuestionDisplay qd = new QuestionDisplay(primaryStage, gameScene);
+
+
+        primaryStage.setScene(qd.getScene());
     }
-
-    public void showMCQuestionPopup(Question1 q) {
-
-        Stage stage = new Stage();
-        stage.setTitle("Question");
-
-        VBox layout = new VBox(15);
-        layout.setAlignment(Pos.CENTER);
-
-        Label questionText = new Label(q.getQuestionString());
-        questionText.setWrapText(true);
-
-        String[] ops = q.getAnswers();
-
-        ToggleGroup group = new ToggleGroup();
-
-        RadioButton A = new RadioButton("A) " + ops[0]);
-        RadioButton B = new RadioButton("B) " + ops[1]);
-        RadioButton C = new RadioButton("C) " + ops[2]);
-        RadioButton D = new RadioButton("D) " + ops[3]);
-
-        A.setToggleGroup(group);
-        B.setToggleGroup(group);
-        C.setToggleGroup(group);
-        D.setToggleGroup(group);
-
-        Button submit = new Button("Submit");
-
-        submit.setOnAction(e -> {
-
-            if (!timerRunning) { stage.close(); return; }
-
-            RadioButton selected = (RadioButton) group.getSelectedToggle();
-            if (selected == null) return;
-
-            char response = selected.getText().charAt(0);  // 'A', 'B', 'C', 'D'
-            boolean correct = answerManager.checkAnswer(response);
-
-            if (correct) {
-                int base = 100;
-                int bonus = Math.max(0, timeRemaining / 4);
-                score += base + bonus;
-                updateScoreLabel();
-                showAlert("Correct!", "You earned 100 + " + bonus + " bonus!");
-            }
-            else {
-                showAlert("Incorrect", "Try again next time!");
-            }
-
-            stage.close();
-        });
-
-        layout.getChildren().addAll(questionText, A, B, C, D, submit);
-
-        Scene scene = new Scene(layout, 400, 300);
-        stage.setScene(scene);
-        stage.show();
-    }
-
-    private void showAlert(String title, String msg) {
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle(title);
-        alert.setHeaderText(null);
-        alert.setContentText(msg);
-        alert.showAndWait();
-    }
-
+    
     private void endGame() {
-        showAlert("Time's Up!", "Final Score: " + score);
-        // TODO: transition to leaderboard or summary screen
+        stopTimer();
     }
 }

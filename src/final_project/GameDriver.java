@@ -20,6 +20,7 @@ import javafx.scene.layout.*;
 import javafx.scene.text.*;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
@@ -106,11 +107,37 @@ public class GameDriver extends Application {
 
 	/// Method for handling when the user clicks the start button (unfinished)
 	public void startButtonClick(ActionEvent event) {
-		Text text = new Text("Test window after clicking start.\n This will use the scene created in a MemoryGame child class");
-		FlowPane pane = new FlowPane(text);
-		Scene testScene = new Scene(pane,400,400);
-		stage.setScene(testScene);
+
+	    String playerName = playerField.getText().trim();
+	    if (playerName.isEmpty()) {
+	        Alert alert = new Alert(AlertType.WARNING);
+	        alert.setHeaderText(null);
+	        alert.setTitle("Missing Name");
+	        alert.setContentText("Please enter a player name before starting the game.");
+	        alert.showAndWait();
+	        return;
+	    }
+
+	    // Score label shown during the game
+	    Label scoreLabel = new Label("Score: 0");
+	    Label timerLabel = new Label("Time: 60s");
+
+	    MemoryGame game;
+
+	    if (easyButton.isSelected()) {
+	        game = new Easy(stage, scoreLabel);
+	    }
+	    else if (mediumButton.isSelected()) {
+	        game = new Medium(stage, scoreLabel);
+	    }
+	    else {
+	        game = new Hard(stage, scoreLabel, timerLabel);
+	    }
+
+	    // Switch to the MemoryGame scene
+	    stage.setScene(game.getScene());
 	}
+
 	
 	/// Method for showing game info when the user clicks the info button (unfinished)
 	public void infoButtonClick(ActionEvent event) {

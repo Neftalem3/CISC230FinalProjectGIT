@@ -1,5 +1,6 @@
 package final_project;
 
+import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -35,9 +36,15 @@ public abstract class MemoryGame implements Showable {
     protected HashMap<Rectangle, Integer> cardValues = new HashMap<>();
     protected int[] shuffledValues = new int[16]; // 8 pairs (1-8 twice)
 
+    protected BorderPane root;
+    
     public MemoryGame() {
         generateCardPairs();
         buildGridUI();
+    }
+    
+    public void setTop(Node n) {
+        root.setTop(n);
     }
 
     // -----------------------
@@ -85,7 +92,7 @@ public abstract class MemoryGame implements Showable {
             }
         }
 
-        BorderPane root = new BorderPane();
+        root = new BorderPane();
         root.setCenter(grid);
 
         gameScene = new Scene(root, 600, 600);

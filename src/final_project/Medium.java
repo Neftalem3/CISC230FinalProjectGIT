@@ -1,8 +1,9 @@
 package final_project;
 
 import javafx.scene.Scene;
-import java.util.Collections;
-import java.util.Scanner;
+import javafx.scene.control.Label;
+import javafx.stage.Stage;
+import java.io.File;
 
 /**
 *
@@ -16,76 +17,48 @@ import java.util.Scanner;
 */
 public class Medium extends MemoryGame {
 
-    Scanner input = new Scanner(System.in);
+    private Answer answerManager;
+    private int score = 0;
+    private Label scoreLabel;
 
-    // This runs the normal, untimed game
-    public void startGame() {
+    private Stage primaryStage;  // needed to swap scenes
 
-        // Shuffle the questions so every playthrough is different
-        Collections.shuffle(questionBank);
+    public Medium(Stage primaryStage, Label scoreLabel) {
+        super(); // builds MemoryGame grid
+        this.primaryStage = primaryStage;
+        this.scoreLabel = scoreLabel;
 
-        int score = 0;
-
-        System.out.println("=== STANDARD MODE ===");
-
-        // Loop through every question in the bank
-        for (int i = 0; i < questionBank.size(); i++) {
-
-            Question q = questionBank.get(i);
-
-            // Print question number and text
-            System.out.println("\nQuestion " + (i + 1));
-            System.out.println(q.getQuestionText());
-
-            // Multiple choice
-            if (q.getType() == Question.Type.MULTIPLE_CHOICE) {
-
-                System.out.println("A) " + q.getOptions()[0]);
-                System.out.println("B) " + q.getOptions()[1]);
-                System.out.println("C) " + q.getOptions()[2]);
-                System.out.println("D) " + q.getOptions()[3]);
-
-                System.out.print("Your answer: ");
-                String answer = input.nextLine().trim().toUpperCase();
-
-                if (answer.equals(q.getCorrectOption().toUpperCase())) {
-                    System.out.println("Correct!");
-                    score++;
-                } else {
-                    System.out.println("Incorrect.");
-                }
-            }
-
-            // True/False
-            else if (q.getType() == Question.Type.TRUE_FALSE) {
-
-                System.out.println("A) True");
-                System.out.println("B) False");
-
-                System.out.print("Your answer: ");
-                String answer = input.nextLine().trim().toUpperCase();
-
-                // Convert A/B to True/False strings
-                if (answer.equals("A")) answer = "TRUE";
-                if (answer.equals("B")) answer = "FALSE";
-
-                if (answer.equals(q.getCorrectOption().toUpperCase())) {
-                    System.out.println("Correct!");
-                    score++;
-                } else {
-                    System.out.println("Incorrect.");
-                }
-            }
-        }
-
-        // Final score
-        System.out.println("\n=== END OF GAME ===");
-        System.out.println("Final Score: " + score + " / " + questionBank.size());
+        answerManager = new Answer();
+        loadMCQuestions();
     }
-    
-	public Scene getScene() {
-		return null;
-	}
-	
 
+    private void loadMCQuestions() {
+        try {
+            answerManager.loadQuestions(
+                new File("MCQuestions.txt"),
+                Question.Type.MULTIPLE_CHOICE
+            );
+        } catch (Exception e) {
+            System.out.println("Error loading MC questions: " + e.getMessage());
+        }
+    }
+
+    @Override
+    public Scene getScene() {
+        return gameScene;
+    }
+
+    @Override
+    public void askQuestion() {
+
+        // Select a random multiple-choice question
+        answerManager.selectQuestion(Question.Type.MULTIPLE_CHOICE);
+        Question q = answerManager.getQuestion();
+
+        // Build QuestionDisplay scene (MC version)
+        QuestionDisplay qd = new QuestionDisplay(primaryStage, gameScene);
+
+        // switch to question scene
+        primaryStage.setScene(qd.getScene());
+    }
 }
