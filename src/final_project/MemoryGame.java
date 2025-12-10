@@ -16,7 +16,7 @@ public abstract class MemoryGame implements Showable {
 
     ArrayList<Question> questionBank;
 
-    MemoryGame() {
+    public MemoryGame() {
         questionBank = new ArrayList<>();
         loadTrueFalse("TFQuestions.txt");
         loadMultipleChoice("MCQuestions.txt");
