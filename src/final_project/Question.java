@@ -19,7 +19,7 @@ public class Question {
 	private Type type;
 	
 	/// Type enum for creating either multiple choice or true/false questions. Each have a set point score.
-	enum Type {MULTIPLE_CHOICE(10), TRUE_FALSE(5);
+	enum Type {MULTIPLE_CHOICE(100), TRUE_FALSE(50);
 		private int points;
 		Type(int points) {
 			this.points = points;
