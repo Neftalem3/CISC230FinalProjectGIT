@@ -17,9 +17,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 public class Answer {
 	private Question1 currentQuestion;
-	private ArrayList<Question1> trueFalseQuestions; // Original question list not to be altered
+	// Original question list not to be altered
+	private ArrayList<Question1> trueFalseQuestions; 
 	private ArrayList<Question1> multipleChoiceQuestions;
-	private ArrayList<Question1> gameTFQuestions; // Questions which will be altered during gameplay
+	// Questions which will be altered during gameplay
+	private ArrayList<Question1> gameTFQuestions; 
 	private ArrayList<Question1> gameMCQuestions;
 	
 	public Answer() {
