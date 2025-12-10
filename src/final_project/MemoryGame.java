@@ -30,31 +30,40 @@ import javafx.geometry.Pos;
 */
 
 public abstract class MemoryGame implements Showable {
-    protected Scene gameScene;
-    protected GridPane grid;
+	
+	// Scene and layout components
+    protected Scene gameScene; // Scene containing game board
+    protected GridPane grid; // 4x4 card layout
+    protected BorderPane root; // Container for grid and top bar
 
-    protected Rectangle firstCard = null;
-    protected Rectangle secondCard = null;
+    // Card State Tracking
+    protected Rectangle firstCard = null; // First flip
+    protected Rectangle secondCard = null; // Second flip
 
-    protected HashMap<Rectangle, Integer> cardValues = new HashMap<>();
-    protected HashMap<Rectangle, Text> symbols = new HashMap<>();
+    // Maps each Rectangle card object to the value it represents
+    protected HashMap<Rectangle, Integer> cardValues = new HashMap<>(); // 1-8
+    protected HashMap<Rectangle, Text> symbols = new HashMap<>(); // Card Symbol
+    
     protected int[] shuffledValues = new int[16]; // 8 pairs (1-8 twice)
 
-    protected BorderPane root;
-    
+    // Constructor
     public MemoryGame() {
         generateCardPairs();
         buildGridUI();
     }
     
+    // Allows child classes to place items on the top of the game scene.
+    //	Made for score and timer labels
     public void setTop(Node n) {
         root.setTop(n);
     }
 
-    // -----------------------
-    // GRID + SCENE CREATION
-    // -----------------------
+    // ==========================
+    // Grid and Symbol Generation
+    // ==========================
 
+    // Generates 16 card values, where 1-8 appears twice,
+    // Shuffles cards for random card placement.
     private void generateCardPairs() {
         // Values 1–8 twice (pairs)
         for (int i = 0; i < 16; i++) {
@@ -71,20 +80,27 @@ public abstract class MemoryGame implements Showable {
         }
     }
     
+    // Returns Unicode symbol for each card value
     private String getSymbolForValue(int v) {
         switch (v) {
-            case 1: return "★";   // star
-            case 2: return "◆";   // diamond
-            case 3: return "♥";   // heart
-            case 4: return "♣";   // club
-            case 5: return "♠";   // spade
-            case 6: return "☀";   // sun
-            case 7: return "⚑";   // flag
-            case 8: return "✿";   // flower
+            case 1: return "♻";   // recycling
+            case 2: return "🌱";   // seedling
+            case 3: return "🚲";   // bicycle
+            case 4: return "🐝";   // bee
+            case 5: return "💡";   // light bulb
+            case 6: return "🦋";   // butterfly
+            case 7: return "🌧";   // rain
+            case 8: return "🍎";   // apple
             default: return "?";
         }
     }
 
+    /*
+     * Builds the visual game board consisting of:
+     	* a GridPane with 16 cards
+     	* each card is a StackPane containing a Rectangle + hidden symbol
+     	* the board is placed inside a BorderPane (root)
+     */
     protected void buildGridUI() {
         grid = new GridPane();
         grid.setAlignment(Pos.CENTER);
@@ -93,18 +109,22 @@ public abstract class MemoryGame implements Showable {
 
         int index = 0;
 
+        // Create 4x4 grid of cards
         for (int row = 0; row < 4; row++) {
             for (int col = 0; col < 4; col++) {
 
+            		// Base card rectangle
                 Rectangle card = new Rectangle(100, 100);
                 card.setFill(Color.DARKGRAY);
                 card.setStroke(Color.BLACK);
 
+                // Assign card value (1-8)
                 int val = shuffledValues[index];
                 cardValues.put(card, val);
 
                 card.setOnMouseClicked(e -> handleCardClick(card));
 
+                // Stacks symbol over card
                 StackPane cardPane = new StackPane();
                 cardPane.getChildren().add(card);
 
@@ -115,11 +135,10 @@ public abstract class MemoryGame implements Showable {
 
                 cardPane.getChildren().add(symbol);
 
-                // Store symbol in a map so we can reveal/hide it later
+                // Tracks which symbol belongs to which card
                 symbols.put(card, symbol);
                 
                 grid.add(cardPane, col, row);
-                
                 index++;
             }
         }
@@ -135,16 +154,21 @@ public abstract class MemoryGame implements Showable {
         return gameScene;
     }
 
-    // -----------------------
-    // CARD FLIP + MATCH LOGIC
-    // -----------------------
+    // ============================
+    // Card Flip and Matching Logic
+    // ============================
 
+    // Handles the logic when the user clicks a card.
+    // Stores 2 selected cards and checks for a match.
     private void handleCardClick(Rectangle card) {
+    	
+    		// First card selected
         if (firstCard == null) {
             firstCard = card;
             reveal(card);
             return;
         }
+        // Second card selected (different card)
         else if (secondCard == null && card != firstCard) {
             secondCard = card;
             reveal(card);
@@ -152,16 +176,19 @@ public abstract class MemoryGame implements Showable {
         }
     }
 
+    // Reveals a card by changing color and showing symbol
     protected void reveal(Rectangle card) {
         card.setFill(Color.LIGHTBLUE);
         symbols.get(card).setVisible(true);
     }
 
+    // Hides a card by returning to the original color and hiding symbol
     protected void hide(Rectangle card) {
         card.setFill(Color.DARKGRAY);
         symbols.get(card).setVisible(false);
     }
 
+    // Compares two selected cards and either asks a question or hides the pair
     private void checkMatch() {
         int v1 = cardValues.get(firstCard);
         int v2 = cardValues.get(secondCard);

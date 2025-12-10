@@ -24,12 +24,13 @@ import java.io.File;
 
 public class Medium extends MemoryGame {
 
-    private Answer answerManager;
-    private int score = 0;
-    private Label scoreLabel;
+    private Answer answerManager; // loads, stores, and selects questions
+    private int score = 0; // player score
+    private Label scoreLabel; // label for top bar
 
     private Stage primaryStage;  // needed to swap scenes
 
+    // Constructor
     public Medium(Stage primaryStage, Label scoreLabel) {
         super(); // builds MemoryGame grid
         this.primaryStage = primaryStage;
@@ -41,7 +42,8 @@ public class Medium extends MemoryGame {
         updateScore();
         buildTopBar();
     }
-
+    
+    // Loads Multiple Choice questions into Answer class from text file
     private void loadMCQuestions() {
         try {
             answerManager.loadQuestions(
@@ -53,6 +55,7 @@ public class Medium extends MemoryGame {
         }
     }
     
+    // Builds the display bar at the top of the game screen
     private void buildTopBar() {
         HBox topBar = new HBox(30);
         topBar.setPadding(new Insets(50, 0, 20, 0));
@@ -66,15 +69,25 @@ public class Medium extends MemoryGame {
         this.setTop(topBar); // ← Using the MemoryGame method!
     }
 
+    // Returns the active game scene (grid + top bar)
     @Override
     public Scene getScene() {
         return gameScene;
     }
     
+    // Updates score label
     private void updateScore() {
         scoreLabel.setText("Score: " + score);
     }
 
+    /**
+     * Called automatically when the user successfully matches two cards.
+     *
+     * Behavior for Medium mode:
+	     * Select a MULTIPLE CHOICE question
+	     * Open a QuestionDisplay scene
+	     * If the answer is correct, award +100 points
+     */
     @Override
     public void askQuestion() {
 

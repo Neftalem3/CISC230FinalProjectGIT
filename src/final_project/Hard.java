@@ -1,17 +1,5 @@
 package final_project;
 
-/*
-* File: Hard.java
-* Author: Daniel Grib
-* Course: CISC230
-* Lab: Group Sustainability Lab
-* Date: 12/10/2025
-*
-* Description: Class used to describe a hard level of difficulty
-* 				of a game. It extends the main GUI, which is
-* 				MemoryGame.java
-*/
-
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.geometry.Insets;
@@ -26,24 +14,34 @@ import javafx.util.Duration;
 
 import java.io.File;
 
+/*
+* File: Hard.java
+* Author: Daniel Grib
+* Course: CISC230
+* Lab: Group Sustainability Lab
+* Date: 12/10/2025
+*
+* Description: Class used to describe a hard level of difficulty
+* 				of a game. It extends the main GUI, which is
+* 				MemoryGame.java
+*/
 
 public class Hard extends MemoryGame {
 
-    private Answer answerManager;
-
-    private int score = 0;
-    private Label scoreLabel;
+    private Answer answerManager; // loads, stores, and selects questions
+    private int score = 0; // player score
+    private Label scoreLabel; // label for top bar
 
     private Stage primaryStage;
 
-    private int totalTime = 60;       // 60-second round by default
-    private int timeRemaining = 60;
+    private int totalTime = 120; // 120-second round by default
+    private int timeRemaining = 120;
     private Label timerLabel;
 
     private Timeline timer;
     private boolean timerRunning = false;
 
-
+    // Constructor
     public Hard(Stage primaryStage, Label scoreLabel, Label timerLabel) {
         super();    // builds grid
         this.primaryStage = primaryStage;
@@ -53,13 +51,13 @@ public class Hard extends MemoryGame {
         answerManager = new Answer();
         loadMCQuestions();
 
-        updateScoreLabel();
-        updateTimerLabel();
+        updateScore();
+        updateTimer();
         buildTopBar();
         startTimer();
     }
 
-
+    // Loads Multiple Choice questions into Answer class from text file
     private void loadMCQuestions() {
         try {
             answerManager.loadQuestions(
@@ -70,7 +68,7 @@ public class Hard extends MemoryGame {
             System.out.println("Error loading MC questions: " + e.getMessage());
         }
     }
-
+    // Builds the display bar at the top of the game screen
     private void buildTopBar() {
         HBox topBar = new HBox(30);
         topBar.setPadding(new Insets(50, 0, 20, 0));
@@ -95,7 +93,7 @@ public class Hard extends MemoryGame {
         timer = new Timeline(
             new KeyFrame(Duration.seconds(1), e -> {
                 timeRemaining--;
-                updateTimerLabel();
+                updateTimer();
 
                 if (timeRemaining <= 0) {
                     timerRunning = false;
@@ -119,26 +117,32 @@ public class Hard extends MemoryGame {
         if (timer != null && timerRunning) timer.play();
     }
 
-
-    private void updateTimerLabel() {
+    // Updates time label
+    private void updateTimer() {
         timerLabel.setText("Time: " + Math.max(timeRemaining, 0) + "s");
     }
 
 
-    private void updateScoreLabel() {
+    // Updates score label
+    private void updateScore() {
         scoreLabel.setText("Score: " + score);
     }
 
-
+    // Returns the active game scene (grid + top bar)
     @Override
     public Scene getScene() {
         return gameScene;
     }
 
 
-    // -----------------------------
-    //  Question Handling
-    // -----------------------------
+    /**
+     * Called automatically when the user successfully matches two cards.
+     *
+     * Behavior for Hard mode:
+	     * Select a MULTIPLE CHOICE question
+	     * Open a QuestionDisplay scene
+	     * If the answer is correct, award +100 points
+     */
     @Override
     public void askQuestion() {
         if (!timerRunning) return;
@@ -152,8 +156,12 @@ public class Hard extends MemoryGame {
         QuestionDisplay qd = new QuestionDisplay(
         		primaryStage, 
         		gameScene,
-        		() -> resumeTimer()
-        		);
+        		() -> {
+        			resumeTimer();
+        			score += 100;
+        			updateScore();
+        		}
+        	);
 
 
         primaryStage.setScene(qd.getScene());
