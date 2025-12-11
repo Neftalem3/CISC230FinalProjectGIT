@@ -1,4 +1,5 @@
 package final_project;
+import java.io.FileNotFoundException;
 /*
 * File: GameDriver.java
 * Author: Connor King
@@ -6,7 +7,7 @@ package final_project;
 * Lab: Group Sustainability Lab
 * Date: 12/7/2025
 *
-* Description:	
+* Description:	Driver class for the sustainability game which displays the menu and acts as the entryway for the game.
 * 
 */
 import java.util.ArrayList;
@@ -18,7 +19,6 @@ import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
-import javafx.scene.shape.Rectangle;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
@@ -28,14 +28,17 @@ import javafx.event.ActionEvent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 
-public class GameDriver extends Application {
-	Scene menu; // menu scene stored globally; can be accessed later
+public class GameDriver extends Application{
+	static Scene menu; // menu scene stored globally; can be accessed later
 	RadioButton easyButton;
 	RadioButton mediumButton;
 	RadioButton hardButton;
 	TextField playerField;
-	Stage stage; // used for accessing the Javafx stage globally (rather than just in the start method)
-	public void start(Stage ps) {
+	static Answer answerManager;
+	static Leaderboard leaderboard;
+	static Stage stage; // used for accessing the Javafx stage globally (rather than just in the start method)
+	static Player player;
+	public void start(Stage ps) throws FileNotFoundException {
 		Text titleText = new Text("Sustainability Match Game");
 		Text subtitleText = new Text("A memory matching game involving sustainability trivia");
 		Text difficultyText = new Text("Select a difficulty:");
@@ -48,7 +51,15 @@ public class GameDriver extends Application {
 		Button infoButton = new Button("Info");
 		
 		startButton.setOnAction(this :: startButtonClick);
-		infoButton.setOnAction(this :: infoButtonClick);
+		// FileNotFoundException try / catch block
+		infoButton.setOnAction(event -> {
+			try {
+				infoButtonClick(event);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		});
 		
 		// Create title text as bold and with a larger font size
 		FontWeight weight = FontWeight.BOLD;
@@ -117,7 +128,12 @@ public class GameDriver extends Application {
 	        alert.showAndWait();
 	        return;
 	    }
-
+	    
+	    // Create player representing the user
+	    player = new Player(playerName);
+	    
+	    
+	    
 	    // Score label shown during the game
 	    Label scoreLabel = new Label("Score: 0");
 	    Label timerLabel = new Label("Time: 60s");
@@ -140,12 +156,39 @@ public class GameDriver extends Application {
 
 	
 	/// Method for showing game info when the user clicks the info button (unfinished)
-	public void infoButtonClick(ActionEvent event) {
+	public void infoButtonClick(ActionEvent event) throws FileNotFoundException {
 		Alert alert = new Alert(AlertType.INFORMATION);
 		alert.setHeaderText(null);
 		alert.setTitle("Game Information");
 		alert.setContentText("insert game information here");
 		alert.showAndWait(); // Wait until user clicks "OK" before continuing
+		Player player = new Player("Alpha");
+		player.setScore(400);
+		Leaderboard leaderboard = new Leaderboard(player);
+		leaderboard.loadPastLeaderboard();
+		stage.setScene(leaderboard.getScene());
+	}
+	
+	/// Method used for accessing the primary stage elsewhere (e.g. from the Leaderboard class)
+	public static Stage getPrimaryStage() {
+		return stage;
+	}
+	
+	/// Method for getting the menu scene from a different class
+	public static Scene getMenuScene() {
+		return menu;
+	}
+	
+	public static Leaderboard getLeaderboard() {
+		return leaderboard;
+	}
+	
+	public static Answer getAnswerManager() {
+		return answerManager;
+	}
+	
+	public static Player getPlayer() {
+		return player;
 	}
 	
 	//public static void main (String[] args) {
