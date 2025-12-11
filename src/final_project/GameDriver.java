@@ -10,8 +10,6 @@ import java.io.FileNotFoundException;
 * Description:	Driver class for the sustainability game which displays the menu and acts as the entryway for the game.
 * 
 */
-import java.util.ArrayList;
-import java.util.Random;
 
 import javafx.application.Application;
 import javafx.geometry.Pos;
@@ -34,8 +32,8 @@ public class GameDriver extends Application{
 	RadioButton mediumButton;
 	RadioButton hardButton;
 	TextField playerField;
-	static Answer answerManager;
-	static Leaderboard leaderboard;
+    static MemoryGame game;
+    
 	static Stage stage; // used for accessing the Javafx stage globally (rather than just in the start method)
 	static Player player;
 	public void start(Stage ps) throws FileNotFoundException {
@@ -44,6 +42,7 @@ public class GameDriver extends Application{
 		Text difficultyText = new Text("Select a difficulty:");
 		Text playerNameText = new Text("Enter player name:");
 		playerField = new TextField();
+		
 		playerField.setMaxWidth(100);
 		
 		// Create buttons and set their handlers
@@ -119,6 +118,7 @@ public class GameDriver extends Application{
 	}
 
 	/// Method for handling when the user clicks the start button (unfinished)
+	
 	public void startButtonClick(ActionEvent event) {
 
 	    String playerName = playerField.getText().trim();
@@ -134,13 +134,10 @@ public class GameDriver extends Application{
 	    // Create player representing the user
 	    player = new Player(playerName);
 	    
-	    
-	    
 	    // Score label shown during the game
 	    Label scoreLabel = new Label("Score: 0");
 	    Label timerLabel = new Label("Time: 60s");
 
-	    MemoryGame game;
 
 	    if (easyButton.isSelected()) {
 	        game = new Easy(stage, scoreLabel);
@@ -166,9 +163,6 @@ public class GameDriver extends Application{
 		alert.showAndWait(); // Wait until user clicks "OK" before continuing
 		// Currently testing leaderboard in this method --> DELETE BEFORE SUBMISSION
 		Player player = new Player("player");
-		Leaderboard leaderboard = new Leaderboard(player);
-		leaderboard.loadPastLeaderboard();
-		stage.setScene(leaderboard.getScene());
 	}
 	
 	public void difficultyButtonClick(ActionEvent event) {
@@ -181,7 +175,7 @@ public class GameDriver extends Application{
 	}
 	
 	/// Method used for accessing the primary stage elsewhere (e.g. from the Leaderboard class)
-	public static Stage getPrimaryStage() {
+	public static  Stage getPrimaryStage() {
 		return stage;
 	}
 	
@@ -190,20 +184,15 @@ public class GameDriver extends Application{
 		return menu;
 	}
 	
-	public static Leaderboard getLeaderboard() {
-		return leaderboard;
-	}
-	
-	public static Answer getAnswerManager() {
-		return answerManager;
-	}
-	
 	public static Player getPlayer() {
 		return player;
 	}
 	
-	//public static void main (String[] args) {
-	//	launch(args);
-	//}
+	public static void main (String[] args) {
+		launch(args);
+	}
+	public static MemoryGame getGameType() {
+		return game;
+	}
 
 }

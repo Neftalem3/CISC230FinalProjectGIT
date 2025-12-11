@@ -4,8 +4,12 @@ Foo
 100
 Zoo
 100
+Zoo
+55
 Bar
 50
+player
+0
 player
 0
 player

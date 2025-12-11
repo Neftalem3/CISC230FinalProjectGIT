@@ -1,8 +1,10 @@
 package final_project;
 
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
@@ -23,12 +25,12 @@ import java.io.File;
 */
 
 public class Easy extends MemoryGame {
-
+	private final String typeClass = "Easy";
     private Answer answerManager; // loads, stores, and selects questions
     private int score = 0; // player score
     private Label scoreLabel; // label for top bar
-
     private Stage primaryStage;  // needed to swap scenes
+    private Button endGame;
 
     // Constructor
     public Easy(Stage primaryStage, Label scoreLabel) {
@@ -58,6 +60,8 @@ public class Easy extends MemoryGame {
     
     // Builds the display bar at the top of the game screen
     private void buildTopBar() {
+    	endGame = new Button("End Game");
+    	endGame.setOnAction(this::endCurrentGame);
         HBox topBar = new HBox(30);
         topBar.setPadding(new Insets(50, 0, 20, 0));
         topBar.setAlignment(Pos.CENTER);
@@ -67,6 +71,7 @@ public class Easy extends MemoryGame {
 
 
         topBar.getChildren().add(scoreLabel);
+        topBar.getChildren().add(endGame);
 
         this.setTop(topBar);
     }
@@ -78,8 +83,12 @@ public class Easy extends MemoryGame {
     }
     
     // Updates score label
-    private void updateScore() {
-        scoreLabel.setText("Score: " + score);
+    public void endCurrentGame(ActionEvent end) {
+    	primaryStage.setScene(board.getScene());
+    	
+    }
+    public void updateScore() {
+        scoreLabel.setText("Score: " + GameDriver.player.getScore());
     }
 
     /**
@@ -99,11 +108,14 @@ public class Easy extends MemoryGame {
 
         // Build QuestionDisplay scene
         QuestionDisplay qd = new QuestionDisplay(
-            primaryStage,
+        	typeClass,
+        primaryStage,
+          q,
             gameScene,
             () -> {
                 // Callback when returning to the grid
                 score += 50;
+                
                 updateScore();
             }
         );
@@ -111,4 +123,6 @@ public class Easy extends MemoryGame {
         // Switch to the question scene
         primaryStage.setScene(qd.getScene());
     }
+
+	
 }

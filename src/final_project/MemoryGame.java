@@ -2,6 +2,8 @@ package final_project;
 
 import javafx.scene.Node;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
@@ -14,6 +16,7 @@ import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import javafx.event.ActionEvent;
 import javafx.geometry.Pos;
 
 
@@ -32,10 +35,11 @@ import javafx.geometry.Pos;
 public abstract class MemoryGame implements Showable {
 	
 	// Scene and layout components
+	protected Leaderboard board = new Leaderboard(GameDriver.player);
     protected Scene gameScene; // Scene containing game board
     protected GridPane grid; // 4x4 card layout
     protected BorderPane root; // Container for grid and top bar
-
+    protected int score =0;
     // Card State Tracking
     protected Rectangle firstCard = null; // First flip
     protected Rectangle secondCard = null; // Second flip
@@ -50,8 +54,14 @@ public abstract class MemoryGame implements Showable {
     public MemoryGame() {
         generateCardPairs();
         buildGridUI();
+        try {
+        	board.loadPastLeaderboard();
+        }
+        catch (Exception E) {
+        	System.out.println("Error loading leaderboard");
+        }
     }
-    
+   
     // Allows child classes to place items on the top of the game scene.
     //	Made for score and timer labels
     public void setTop(Node n) {
@@ -94,6 +104,7 @@ public abstract class MemoryGame implements Showable {
             default: return "?";
         }
     }
+    
 
     /*
      * Builds the visual game board consisting of:
@@ -106,6 +117,9 @@ public abstract class MemoryGame implements Showable {
         grid.setAlignment(Pos.CENTER);
         grid.setHgap(15);
         grid.setVgap(15);
+        
+        
+        
 
         int index = 0;
 
@@ -137,9 +151,10 @@ public abstract class MemoryGame implements Showable {
 
                 // Tracks which symbol belongs to which card
                 symbols.put(card, symbol);
-                
+
                 grid.add(cardPane, col, row);
                 index++;
+                
             }
         }
 
@@ -175,7 +190,11 @@ public abstract class MemoryGame implements Showable {
             checkMatch();
         }
     }
-
+    private void endGame(ActionEvent end) {
+    	
+    	
+    }
+    
     // Reveals a card by changing color and showing symbol
     protected void reveal(Rectangle card) {
         card.setFill(Color.LIGHTBLUE);
@@ -216,4 +235,5 @@ public abstract class MemoryGame implements Showable {
     }
 
     public abstract void askQuestion();
+	
 }

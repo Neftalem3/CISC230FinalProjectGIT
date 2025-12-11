@@ -61,12 +61,12 @@ public class Answer {
 			questionList = multipleChoiceQuestions;
 			gameQuestionList = gameMCQuestions;
 		}
-		String[] answers = new String[length];
 
 		// Scan until reaching end of file
 		while (scan.hasNextLine()) {
 			topic = scan.nextLine();
 			questionString = scan.nextLine();
+			String[] answers = new String[length];
 			for (int i = 0; i < length; i++) {
 				answers[i] = scan.nextLine();
 			}

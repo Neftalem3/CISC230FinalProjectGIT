@@ -18,9 +18,7 @@ import java.io.IOException;
 import java.io.File;
 import java.io.FileNotFoundException;
 
-import javafx.application.Application;
 import javafx.geometry.Pos;
-import javafx.stage.Stage;
 import javafx.scene.Scene;
 import javafx.scene.layout.*;
 import javafx.scene.text.*;
@@ -33,6 +31,7 @@ import javafx.event.ActionEvent;
 
 
 public class Leaderboard implements Showable {
+	GameDriver gareRunner = new GameDriver();
 	private ArrayList<Player> players; // will be used for sorting past players plus the current player
 	private Player currentPlayer;
 	
@@ -163,7 +162,9 @@ public class Leaderboard implements Showable {
 	}
 	
 	public void continueClick (ActionEvent event) {
-		GameDriver.getPrimaryStage().setScene(GameDriver.getMenuScene());
+		GameDriver.getPrimaryStage();
+		GameDriver.stage.setScene(GameDriver.getMenuScene());
+		//GameDriver.getPrimaryStage().setScene(GameDriver.getMenuScene());
 		try {
 			writeFile();
 		}
@@ -172,4 +173,6 @@ public class Leaderboard implements Showable {
 		}
 		
 	}
+
+	
 }

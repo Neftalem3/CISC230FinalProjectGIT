@@ -2,9 +2,11 @@ package final_project;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.HBox;
 import javafx.scene.text.Font;
@@ -27,10 +29,11 @@ import java.io.File;
 */
 
 public class Hard extends MemoryGame {
-
+	private final String typeClass = "Hard";
     private Answer answerManager; // loads, stores, and selects questions
     private int score = 0; // player score
     private Label scoreLabel; // label for top bar
+    private Button endGame;
 
     private Stage primaryStage;
 
@@ -38,8 +41,8 @@ public class Hard extends MemoryGame {
     private int timeRemaining = 120;
     private Label timerLabel;
 
-    private Timeline timer;
-    private boolean timerRunning = false;
+    private static Timeline timer;
+    private static boolean timerRunning = false;
 
     // Constructor
     public Hard(Stage primaryStage, Label scoreLabel, Label timerLabel) {
@@ -55,6 +58,10 @@ public class Hard extends MemoryGame {
         updateTimer();
         buildTopBar();
         startTimer();
+        
+        
+        
+        
     }
 
     // Loads Multiple Choice questions into Answer class from text file
@@ -70,6 +77,8 @@ public class Hard extends MemoryGame {
     }
     // Builds the display bar at the top of the game screen
     private void buildTopBar() {
+    	endGame = new Button("End Game");
+    	endGame.setOnAction(this::endCurrentGame);
         HBox topBar = new HBox(30);
         topBar.setPadding(new Insets(50, 0, 20, 0));
         topBar.setAlignment(Pos.CENTER);
@@ -80,6 +89,7 @@ public class Hard extends MemoryGame {
         timerLabel.setFont(Font.font("System", FontWeight.BOLD, 24));
 
         topBar.getChildren().addAll(scoreLabel, timerLabel);
+        topBar.getChildren().add(endGame);
 
         this.setTop(topBar); // ← Using the MemoryGame method!
     }
@@ -87,7 +97,7 @@ public class Hard extends MemoryGame {
     // -----------------------------
     //  Timer Control
     // -----------------------------
-    private void startTimer() {
+    public void startTimer() {
         timerRunning = true;
 
         timer = new Timeline(
@@ -113,7 +123,7 @@ public class Hard extends MemoryGame {
     }
 
 
-    private void resumeTimer() {
+    public static void resumeTimer() {
         if (timer != null && timerRunning) timer.play();
     }
 
@@ -124,7 +134,7 @@ public class Hard extends MemoryGame {
 
 
     // Updates score label
-    private void updateScore() {
+    public void updateScore() {
         scoreLabel.setText("Score: " + score);
     }
 
@@ -133,7 +143,10 @@ public class Hard extends MemoryGame {
     public Scene getScene() {
         return gameScene;
     }
-
+    public void endCurrentGame(ActionEvent end) {
+    	primaryStage.setScene(board.getScene());
+    	
+    }
 
     /**
      * Called automatically when the user successfully matches two cards.
@@ -154,20 +167,25 @@ public class Hard extends MemoryGame {
         Question q = answerManager.getQuestion();
 
         QuestionDisplay qd = new QuestionDisplay(
-        		primaryStage, 
-        		gameScene,
-        		() -> {
-        			resumeTimer();
-        			score += 100;
-        			updateScore();
-        		}
-        	);
+        		typeClass, 
+                primaryStage,
+                  q,
+                    gameScene,
+                    () -> {
+                        // Callback when returning to the grid
+                        score += 50;
+                        updateScore();
+                    }
+                );
 
 
+        updateScore();
         primaryStage.setScene(qd.getScene());
     }
     
     private void endGame() {
         stopTimer();
     }
+
+	
 }
