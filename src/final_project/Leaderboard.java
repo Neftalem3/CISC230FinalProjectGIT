@@ -14,6 +14,7 @@ import java.util.Collections;
 import java.util.ArrayList;
 
 import java.io.FileWriter;
+import java.io.IOException;
 import java.io.File;
 import java.io.FileNotFoundException;
 
@@ -53,18 +54,33 @@ public class Leaderboard implements Showable {
 	
 	/// Helper method which loads the past top players from a file along with their scores, using this data to create an ArrayList of players.
 	public void loadPastLeaderboard() throws FileNotFoundException{
-		File file = new File("File:leaderboard.txt");
+		File file = new File("leaderboard.txt");
 		Scanner scan = new Scanner(file);
 		String playerName;
 		int points;
 		while (scan.hasNextLine()) {
 			playerName = scan.nextLine();
-			points = scan.nextInt();
+			if (playerName.trim().isEmpty())
+				break;
+			String pointString = scan.nextLine();
+			points = Integer.parseInt(pointString.trim());
 			Player player = new Player(playerName);
 			player.setScore(points);
 			players.add(player);
 		}
 		scan.close();
+		
+		Collections.sort(players);
+	}
+	
+	public void writeFile() throws IOException {
+		
+		FileWriter writer = new FileWriter("leaderboard.txt",false);
+		for (Player player : players) {
+			writer.write(player.getName() + "\n" + player.getScore() + "\n");
+		}
+		writer.close();
+		
 	}
 	
 	/// Method for creating and returning a scene to be shown via the Javafx GUI.
@@ -88,15 +104,27 @@ public class Leaderboard implements Showable {
 		textArray[0][0] = playerText;
 		textArray[0][1] = scoreText;
 		for (int i = 1; i < textArray.length; i++) {
-			textArray[i][0] = new Text(" " + i);
+			textArray[i][0] = new Text(" " + i + ". ");
 			textArray[i][1] = new Text();
 		}
+		// Add current player if they make it on the leaderboard
+		if (players.size() < 10) {
+			players.add(currentPlayer);
+		}
+		else if (Collections.min(players).getScore() <= currentPlayer.getScore()) {
+			players.removeLast();
+			players.add(currentPlayer);
+		}
+		Collections.sort(players);
+		
+		
 		
 		int playerNum = 1;
 		for (Player player : players) {
 			String nameText = textArray[playerNum][0].getText() + player.getName();
 			textArray[playerNum][0].setText(nameText);
 			textArray[playerNum][1].setText(" " + player.getScore());
+			playerNum++;
 		}
 
 		
@@ -136,5 +164,12 @@ public class Leaderboard implements Showable {
 	
 	public void continueClick (ActionEvent event) {
 		GameDriver.getPrimaryStage().setScene(GameDriver.getMenuScene());
+		try {
+			writeFile();
+		}
+		catch (IOException e) {
+			System.out.println("File error: Cannot find file :(");
+		}
+		
 	}
 }

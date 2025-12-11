@@ -1,0 +1,8 @@
+Alpha
+400
+Foo
+100
+Zoo
+100
+Bar
+50

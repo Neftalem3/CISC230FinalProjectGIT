@@ -53,10 +53,10 @@ public class Player implements Comparable<Player>{
     		return 0;
     	}
     	else if (this.score > player.getScore()) {
-    		return 1;
+    		return -1;
     	}
     	else
-    		return -1;
+    		return 1;
     }
 
     // toString method for Leaderboard
