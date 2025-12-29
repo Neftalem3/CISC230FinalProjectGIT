@@ -32,3 +32,8 @@ How to Run
 * `MemoryGame.java`: Abstract engine handling the 4x4 grid logic.
 * `Answer.java`: Manages question loading and randomization.
 * `Leaderboard.java`: Handles file I/O for saving high scores.
+
+<p align="center">
+  <video src="https://github.com/user-attachments/assets/4b3c8989-5182-4d0c-94ca-3e4499222246" width="80%" controls></video>
+</p>
+
