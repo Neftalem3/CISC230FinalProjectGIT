@@ -13,7 +13,6 @@ import javafx.stage.Stage;
 import java.io.File;
 
 /*
-* File: Medium.java
 * Author: Zuefeng Xiong and Daniel Grib
 * Course: CISC230
 * Lab: Group Sustainability Lab
