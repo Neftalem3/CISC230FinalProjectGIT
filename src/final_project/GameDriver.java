@@ -2,7 +2,6 @@ package final_project;
 import java.io.FileNotFoundException;
 /*
 * File: GameDriver.java
-* Author: Connor King
 * Course: CISC230
 * Lab: Group Sustainability Lab
 * Date: 12/7/2025
