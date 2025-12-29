@@ -1,7 +1,6 @@
 package final_project;
 /*
 * File: Leaderboard.java
-* Author: Connor King, 
 * Course: CISC230
 * Lab: Group Sustainability Lab
 * Date: 12/7/2025
