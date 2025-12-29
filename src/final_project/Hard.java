@@ -18,7 +18,6 @@ import java.io.File;
 
 /*
 * File: Hard.java
-* Author: Daniel Grib
 * Course: CISC230
 * Lab: Group Sustainability Lab
 * Date: 12/10/2025
