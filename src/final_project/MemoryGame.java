@@ -22,7 +22,6 @@ import javafx.geometry.Pos;
 
 /*
 * File: MemoryGame.java
-* Author: Zuefeng Xiong and Daniel Grib
 * Course: CISC230
 * Lab: Group Sustainability Lab
 * Date: 12/10/2025
